@@ -1,0 +1,8 @@
+node_modules
+videos
+reports
+reports_html
+**/*.DS_Store
+.idea
+testResults
+.dockerignore

@@ -1,0 +1,54 @@
+version: '2'
+services:
+  db:
+    image: postgres:9.5
+    container_name: contact_list_db
+    environment:
+      - POSTGRES_USER=contact_list
+      - POSTGRES_PASSWORD=contact_list
+      - POSTGRES_DB=contact_list_test
+    ports:
+      - "5432:5432"
+
+  web:
+    image: caballerojavier13/contact_list_app:latest
+    container_name: contact_list_app
+    command: >
+      bash -c "sleep 10 && 
+               cd /contact-list &&  
+               bundle exec rake db:migrate &&
+               bin/rails server --port 3000 --binding 0.0.0.0"
+    environment:
+      - RAILS_ENV=test 
+    ports:
+      - "3000:3000"
+    links:
+      - "db:contact-list_db"
+      
+  firefox:
+    image: selenium/node-firefox:latest
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - hub
+    environment:
+      HUB_HOST: selenium_hub
+
+  chrome:
+    image: selenium/node-chrome:latest
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - hub
+    environment:
+      HUB_HOST: selenium_hub
+
+  hub:
+    image: selenium/hub:latest
+    container_name: selenium_hub
+    ports:
+      - "4444:4444"
+
+  test:
+    image: caballerojavier13/contact_list_test:latest
+    container_name: contact_list_test
